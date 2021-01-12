@@ -20,15 +20,15 @@
     var CONFIG = {"hostname":"posheng.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta name="description" content="Kotlin × 開發環境介紹Kotlin × 變數型別Kotlin × 流程控制Kotlin × 函數介紹Kotlin × Collections 介紹Kotlin × 類別與物件Kotlin × 類別繼承、介面、抽象Kotlin × 例外處理Kotlin × 泛型 GenericKotlin × 函數式程式設計">
+  <meta name="description" content="Google 在 2017 年 Google I&#x2F;O 開發者大會中，正式宣布 Kotlin 納入 Android 程式的官方一級開發語言，且Kotlin在實際開發上也擁有許多優點，例如語法簡潔、舒適與Java語言相容等優勢，而 Spring 作為 Java 生態圈普及率最高的 Web 後端框架，利用這篇文章記錄一下學習 Kotlin 語言並應用於 Spring Boot 網站開發。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Kotlin &amp; Spring Boot">
 <meta property="og:url" content="https://posheng.github.io/2021/01/12/kotlin-springboot/index.html">
 <meta property="og:site_name" content="Samuel&#39;s Blog">
-<meta property="og:description" content="Kotlin × 開發環境介紹Kotlin × 變數型別Kotlin × 流程控制Kotlin × 函數介紹Kotlin × Collections 介紹Kotlin × 類別與物件Kotlin × 類別繼承、介面、抽象Kotlin × 例外處理Kotlin × 泛型 GenericKotlin × 函數式程式設計">
+<meta property="og:description" content="Google 在 2017 年 Google I&#x2F;O 開發者大會中，正式宣布 Kotlin 納入 Android 程式的官方一級開發語言，且Kotlin在實際開發上也擁有許多優點，例如語法簡潔、舒適與Java語言相容等優勢，而 Spring 作為 Java 生態圈普及率最高的 Web 後端框架，利用這篇文章記錄一下學習 Kotlin 語言並應用於 Spring Boot 網站開發。">
 <meta property="og:locale" content="zh_TW">
 <meta property="article:published_time" content="2021-01-11T16:00:00.000Z">
-<meta property="article:modified_time" content="2021-01-12T02:03:00.937Z">
+<meta property="article:modified_time" content="2021-01-12T02:08:00.781Z">
 <meta property="article:author" content="Samuel Huang">
 <meta property="article:tag" content="Kotlin">
 <meta property="article:tag" content="Spring Boot">
@@ -182,7 +182,7 @@
               <span class="post-meta-item-text">發表於</span>
               
 
-              <time title="創建時間：2021-01-12 00:00:00 / 修改時間：10:03:00" itemprop="dateCreated datePublished" datetime="2021-01-12T00:00:00+08:00">2021-01-12</time>
+              <time title="創建時間：2021-01-12 00:00:00 / 修改時間：10:08:00" itemprop="dateCreated datePublished" datetime="2021-01-12T00:00:00+08:00">2021-01-12</time>
             </span>
 
           
@@ -196,7 +196,9 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h1 id="Kotlin-×-開發環境介紹"><a href="#Kotlin-×-開發環境介紹" class="headerlink" title="Kotlin × 開發環境介紹"></a>Kotlin × 開發環境介紹</h1><h1 id="Kotlin-×-變數型別"><a href="#Kotlin-×-變數型別" class="headerlink" title="Kotlin × 變數型別"></a>Kotlin × 變數型別</h1><h1 id="Kotlin-×-流程控制"><a href="#Kotlin-×-流程控制" class="headerlink" title="Kotlin × 流程控制"></a>Kotlin × 流程控制</h1><h1 id="Kotlin-×-函數介紹"><a href="#Kotlin-×-函數介紹" class="headerlink" title="Kotlin × 函數介紹"></a>Kotlin × 函數介紹</h1><h1 id="Kotlin-×-Collections-介紹"><a href="#Kotlin-×-Collections-介紹" class="headerlink" title="Kotlin × Collections 介紹"></a>Kotlin × Collections 介紹</h1><h1 id="Kotlin-×-類別與物件"><a href="#Kotlin-×-類別與物件" class="headerlink" title="Kotlin × 類別與物件"></a>Kotlin × 類別與物件</h1><h1 id="Kotlin-×-類別繼承、介面、抽象"><a href="#Kotlin-×-類別繼承、介面、抽象" class="headerlink" title="Kotlin × 類別繼承、介面、抽象"></a>Kotlin × 類別繼承、介面、抽象</h1><h1 id="Kotlin-×-例外處理"><a href="#Kotlin-×-例外處理" class="headerlink" title="Kotlin × 例外處理"></a>Kotlin × 例外處理</h1><h1 id="Kotlin-×-泛型-Generic"><a href="#Kotlin-×-泛型-Generic" class="headerlink" title="Kotlin × 泛型 Generic"></a>Kotlin × 泛型 Generic</h1><h1 id="Kotlin-×-函數式程式設計"><a href="#Kotlin-×-函數式程式設計" class="headerlink" title="Kotlin × 函數式程式設計"></a>Kotlin × 函數式程式設計</h1>
+        <p>Google 在 2017 年 Google I/O 開發者大會中，正式宣布 Kotlin 納入 Android 程式的官方一級開發語言，且Kotlin在實際開發上也擁有許多優點，例如語法簡潔、舒適與Java語言相容等優勢，而 Spring 作為 Java 生態圈普及率最高的 Web 後端框架，利用這篇文章記錄一下學習 Kotlin 語言並應用於 Spring Boot 網站開發。</p>
+<a id="more"></a>
+<h1 id="Kotlin-×-開發環境介紹"><a href="#Kotlin-×-開發環境介紹" class="headerlink" title="Kotlin × 開發環境介紹"></a>Kotlin × 開發環境介紹</h1><h1 id="Kotlin-×-變數型別"><a href="#Kotlin-×-變數型別" class="headerlink" title="Kotlin × 變數型別"></a>Kotlin × 變數型別</h1><h1 id="Kotlin-×-流程控制"><a href="#Kotlin-×-流程控制" class="headerlink" title="Kotlin × 流程控制"></a>Kotlin × 流程控制</h1><h1 id="Kotlin-×-函數介紹"><a href="#Kotlin-×-函數介紹" class="headerlink" title="Kotlin × 函數介紹"></a>Kotlin × 函數介紹</h1><h1 id="Kotlin-×-Collections-介紹"><a href="#Kotlin-×-Collections-介紹" class="headerlink" title="Kotlin × Collections 介紹"></a>Kotlin × Collections 介紹</h1><h1 id="Kotlin-×-類別與物件"><a href="#Kotlin-×-類別與物件" class="headerlink" title="Kotlin × 類別與物件"></a>Kotlin × 類別與物件</h1><h1 id="Kotlin-×-類別繼承、介面、抽象"><a href="#Kotlin-×-類別繼承、介面、抽象" class="headerlink" title="Kotlin × 類別繼承、介面、抽象"></a>Kotlin × 類別繼承、介面、抽象</h1><h1 id="Kotlin-×-例外處理"><a href="#Kotlin-×-例外處理" class="headerlink" title="Kotlin × 例外處理"></a>Kotlin × 例外處理</h1><h1 id="Kotlin-×-泛型-Generic"><a href="#Kotlin-×-泛型-Generic" class="headerlink" title="Kotlin × 泛型 Generic"></a>Kotlin × 泛型 Generic</h1><h1 id="Kotlin-×-函數式程式設計"><a href="#Kotlin-×-函數式程式設計" class="headerlink" title="Kotlin × 函數式程式設計"></a>Kotlin × 函數式程式設計</h1>
     </div>
 
     
