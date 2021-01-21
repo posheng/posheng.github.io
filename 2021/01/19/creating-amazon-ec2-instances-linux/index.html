@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"posheng.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="Launch an Amazon EC2 instance using the management console Launch an Amazon EC2 instance using the AWS Command-Line Interface (AWS CLI)">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Creating Amazon EC2 Instances (Linux)">
+<meta property="og:url" content="https://posheng.github.io/2021/01/19/creating-amazon-ec2-instances-linux/index.html">
+<meta property="og:site_name" content="Samuel&#39;s Blog">
+<meta property="og:description" content="Launch an Amazon EC2 instance using the management console Launch an Amazon EC2 instance using the AWS Command-Line Interface (AWS CLI)">
+<meta property="og:locale" content="zh_TW">
+<meta property="article:published_time" content="2021-01-18T16:00:00.000Z">
+<meta property="article:modified_time" content="2021-01-20T01:31:04.610Z">
+<meta property="article:author" content="Samuel Huang">
+<meta property="article:tag" content="AWS">
+<meta property="article:tag" content="EC2">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://posheng.github.io/2021/01/19/creating-amazon-ec2-instances-linux/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-TW'
+  };
+</script>
+
+  <title>Creating Amazon EC2 Instances (Linux) | Samuel's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切換導航欄">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Samuel's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">For the worldwide martial arts, there is no one impregnable, only the swiftness is invincible</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首頁</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>標籤</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>歸檔</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://posheng.github.io/2021/01/19/creating-amazon-ec2-instances-linux/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Samuel Huang">
+      <meta itemprop="description" content="Samuel Notes">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Samuel's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Creating Amazon EC2 Instances (Linux)
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">發表於</span>
+
+              <time title="創建時間：2021-01-19 00:00:00" itemprop="dateCreated datePublished" datetime="2021-01-19T00:00:00+08:00">2021-01-19</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新於</span>
+                <time title="修改時間：2021-01-20 09:31:04" itemprop="dateModified" datetime="2021-01-20T09:31:04+08:00">2021-01-20</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <ul>
+<li>Launch an Amazon EC2 instance using the management console</li>
+<li>Launch an Amazon EC2 instance using the AWS Command-Line Interface (AWS CLI)</li>
+</ul>
+<a id="more"></a>
+<h1 id="Launch-an-Amazon-EC2-Instance-using-the-Management-Console"><a href="#Launch-an-Amazon-EC2-Instance-using-the-Management-Console" class="headerlink" title="Launch an Amazon EC2 Instance using the Management Console"></a>Launch an Amazon EC2 Instance using the Management Console</h1><ol>
+<li>Accessing the AWS Management Console (Opens an AWS Management Console sign-in page and login).</li>
+<li>In the AWS Management Console, on the <code>Services</code> menu, click EC2.</li>
+<li>Click <code>Launch Instance</code></li>
+</ol>
+<h3 id="Step-1-Choose-an-Amazon-Machine-Image-AMI"><a href="#Step-1-Choose-an-Amazon-Machine-Image-AMI" class="headerlink" title="Step 1: Choose an Amazon Machine Image (AMI)"></a>Step 1: Choose an Amazon Machine Image (AMI)</h3><p>選擇一個 AMI，其中包含將用於啟動實例的 disk volume 的副本。<br>AMI列表，其中包含了許多版本的 Microsoft Windows 和 Linux。<br>這些磁盤映像會定期更新，以合併安全補丁程序和軟件，以幫助您使用AWS服務。<br>另外還可以創建包括您自己的數據和應用程序的自己的 AMI，或者可以從AWS Marketplace 選擇預構建的商業應用程序。</p>
+<ol start="4">
+<li>Beside the <code>Amazon Linux 2 AMI</code> (at the top), click Select</li>
+</ol>
+<h3 id="Step-2-Choose-an-Instance-Type"><a href="#Step-2-Choose-an-Instance-Type" class="headerlink" title="Step 2: Choose an Instance Type"></a>Step 2: Choose an Instance Type</h3><p>此步驟您選擇實例類型，該實例類型確定將分配給您的 EC2 實例的資源。 每個實例類型分配虛擬CPU，內存，磁盤存儲和網絡性能的組合。<br>Instance Type 包含計算優化 (Compute-optimized), 記憶體優化(Memory-optimized) 和 硬碟優化 (Storage-Optimized)</p>
+<ol start="5">
+<li>Select t2.micro</li>
+<li>Click <code>Next: Configure Instance Details</code></li>
+</ol>
+<h3 id="Step-3-Configure-Instance-Details"><a href="#Step-3-Configure-Instance-Details" class="headerlink" title="Step 3: Configure Instance Details"></a>Step 3: Configure Instance Details</h3><p>此步驟允許您配置實例詳細信息，例如要啟動的實例數和網絡配置。<br>7. Configure these settings:</p>
+<ul>
+<li> Network: Lab VPC</li>
+<li> Subnet: Public Subnet</li>
+<li> IAM role: Bastion-Role</li>
+</ul>
+<p>Bastion-Role 授予對在實例上運行的應用程序的權限，以向Amazon EC2服務發出請求。<br>8.  Click <code>Next: Add Storage</code></p>
+<h3 id="Step-4-Add-Storage"><a href="#Step-4-Add-Storage" class="headerlink" title="Step 4: Add Storage"></a>Step 4: Add Storage</h3><p>此步驟可用於添加其他Amazon Elastic Block Store（EBS）disk volumes 並配置其大小和性能。<br>9. Click <code>Next: Add Tags</code></p>
+<h3 id="Step-5-Add-Tags"><a href="#Step-5-Add-Tags" class="headerlink" title="Step 5: Add Tags"></a>Step 5: Add Tags</h3><p>Tages 允許您以不同的方式（例如，按目的，所有者或環境）對 AWS 資源進行分類。 當您擁有許多相同類型的資源時，這很有用-您可以通過它們的 Tags 快速識別特定資源。 每個標籤都包含一個 key 和一個 value。<br>10. Click <code>Add Tag</code> then configure:</p>
+<ul>
+<li>Key: <code>Name</code></li>
+<li>Value: <code>Bastion Server</code></li>
+</ul>
+<ol start="11">
+<li>Click <code>Next: Configure Security Group</code></li>
+</ol>
+<h3 id="Step-6-Configure-Security-Group"><a href="#Step-6-Configure-Security-Group" class="headerlink" title="Step 6: Configure Security Group"></a>Step 6: Configure Security Group</h3><p>創建一個允許SSH連接的防火牆 (Security Group)。Security Group 將允許您通過SSH登錄到 Bastion Server。<br>12. Configure these settings:</p>
+<ul>
+<li> Security group name: <code>Bastion security group</code></li>
+<li> Description: <code>Permit SSH connections</code></li>
+</ul>
+<p>Default 配置了通過SSH（端口22）進行訪問 Bastion Server 的權限。<br>13. Click <code>Review and Launch</code></p>
+<h3 id="Step-7-Review-Instance-Launch"><a href="#Step-7-Review-Instance-Launch" class="headerlink" title="Step 7: Review Instance Launch"></a>Step 7: Review Instance Launch</h3><ol start="14">
+<li><p>Click <code>Launch</code><br>A <code>Select an existing key pair or create a new key pair</code> window will appear.</p>
+</li>
+<li><p>Select <code>I acknowledge that....</code></p>
+</li>
+<li><p>Click <code>Launch Instances</code></p>
+</li>
+</ol>
+<h5 id="Your-instance-will-now-be-launched"><a href="#Your-instance-will-now-be-launched" class="headerlink" title="Your instance will now be launched."></a><font color=blue>Your instance will now be launched.</font></h5><ol start="17">
+<li>Click <code>View Instances</code></li>
+<li>Wait for the <code>Instance State</code> to change to <code>running</code>.</li>
+<li>Select <code>Bastion Server</code>.(勾選後下方會顯示有關實例類型，安全設置和網絡設置的信息。)</li>
+</ol>
+<h1 id="Log-into-the-Bastion-Server"><a href="#Log-into-the-Bastion-Server" class="headerlink" title="Log into the Bastion Server"></a>Log into the Bastion Server</h1><p>允許使用基於客戶端的工具（例如Terminal和PuTTY）遠程登錄到EC2實例之外，AWS還提供了兩種託管服務，允許使用標準Web瀏覽器進行遠程登錄。這些工具是 <code>EC2 Instance Connect</code> 和 <code>Session Manager</code>。</p>
+<ol start="20">
+<li>On the Amazon EC2 dashboard, choose Running Instances.</li>
+<li>Select your Bastion Server from the list of running instances and then choose <code>Connect</code> at the top of the page.</li>
+</ol>
+<h5 id="Now-that-you-are-connected-to-the-Bastion-Server-you-can-use-the-AWS-CLI-to-create-and-interact-with-your-AWS-resources"><a href="#Now-that-you-are-connected-to-the-Bastion-Server-you-can-use-the-AWS-CLI-to-create-and-interact-with-your-AWS-resources" class="headerlink" title="Now that you are connected to the Bastion Server, you can use the AWS CLI to create and interact with your AWS resources."></a><font color=blue>Now that you are connected to the Bastion Server, you can use the AWS CLI to create and interact with your AWS resources.</font></h5><h1 id="Launch-an-Instance-using-the-AWS-CLI"><a href="#Launch-an-Instance-using-the-AWS-CLI" class="headerlink" title="Launch an Instance using the AWS CLI"></a>Launch an Instance using the AWS CLI</h1><p>使用 AWS CLI 啟動 Amazon EC2 實例。</p>
+<h3 id="Obtain-the-AMI-to-Use"><a href="#Obtain-the-AMI-to-Use" class="headerlink" title="Obtain the AMI to Use"></a>Obtain the AMI to Use</h3><p>啟動實例時所需的參數之一是Amazon Machine Image（AMI），它將填充實例的啟動磁盤(boot disk)。<br>AWS 會不斷對 AMI 進行補丁和更新，因此建議在啟動實例時始終使用最新的 AMI。<br>我們可以使用 AWS Systems Manager Parameter Store 來獲取最新的 <code>Amazon Linux 2 AMI</code> 的ID。</p>
+<ol start="22">
+<li>Run script in youe ssh session<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> Set the Region</span></span><br><span class="line">AZ=`curl -s http://169.254.169.254/latest/meta-data/placement/availability-zone`</span><br><span class="line">export AWS_DEFAULT_REGION=$&#123;AZ::-1&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> Obtain latest Linux AMI</span></span><br><span class="line">AMI=$(aws ssm get-parameters --names /aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2 --query &#x27;Parameters[0].[Value]&#x27; --output text)</span><br><span class="line"></span><br><span class="line">echo $AMI</span><br></pre></td></tr></table></figure>
+This command did the following:</li>
+</ol>
+<ul>
+<li>Obtained the Region where the instance is running</li>
+<li>Called the AWS Systems Manager (ssm) and used the get-parameters command to retrieve a value from the Parameter Store</li>
+<li>The AMI requested was for Amazon Linux 2 (amzn2-ami)</li>
+<li>The AMI ID has been stored in an Environment Variable called AMI</li>
+</ul>
+<h5 id="如果-SSH-Session-斷開連接，它將丟失存儲在環境變量中的信息。重新連接後，需要重新運行上述命令來重新獲取-AMI-ID。"><a href="#如果-SSH-Session-斷開連接，它將丟失存儲在環境變量中的信息。重新連接後，需要重新運行上述命令來重新獲取-AMI-ID。" class="headerlink" title="如果 SSH Session 斷開連接，它將丟失存儲在環境變量中的信息。重新連接後，需要重新運行上述命令來重新獲取 AMI ID。"></a><font color=red>如果 SSH Session 斷開連接，它將丟失存儲在環境變量中的信息。重新連接後，需要重新運行上述命令來重新獲取 AMI ID。</font></h5><h3 id="Obtain-the-Subnet-to-Use"><a href="#Obtain-the-Subnet-to-Use" class="headerlink" title="Obtain the Subnet to Use"></a>Obtain the Subnet to Use</h3><p>啟動實例時，指定 SubnetId。<br>The following command will retrieve the SubnetId for the Public Subnet:<br>23. Run this script</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">SUBNET=$(aws ec2 describe-subnets --filters &#x27;Name=tag:Name,Values=Public Subnet&#x27; --query Subnets[].SubnetId --output text)</span><br><span class="line"></span><br><span class="line">echo $SUBNET</span><br></pre></td></tr></table></figure>
+<h3 id="Obtain-the-Security-Group-to-Use"><a href="#Obtain-the-Security-Group-to-Use" class="headerlink" title="Obtain the Security Group to Use"></a>Obtain the Security Group to Use</h3><p>A Web Security Group has been provided as part of this lab, which allows inbound HTTP requests.<br>24. Run this script</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">SG=$(aws ec2 describe-security-groups --filters Name=group-name,Values=WebSecurityGroup --query SecurityGroups[].GroupId --output text)</span><br><span class="line"></span><br><span class="line">echo $SG</span><br></pre></td></tr></table></figure>
+<h3 id="Download-a-User-Data-script"><a href="#Download-a-User-Data-script" class="headerlink" title="Download a User Data script"></a>Download a User Data script</h3><p>啟動一個 Web Server 的實例。安裝和配置 Web Server，您將提供一個User Data腳本，該腳本將在實例啟動時自動運行。<br>25. Run this command to download the User Data script:</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget https://us-west-2-tcprod.s3.amazonaws.com/courses/ILT-TF-100-SYSOPS/v3.3.28/lab-2-ec2-linux/scripts/UserData.txt</span><br></pre></td></tr></table></figure>
+<ol start="26">
+<li>Run this command to view the contents of the script:<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cat UserData.txt</span><br></pre></td></tr></table></figure>
+The script does the following:</li>
+</ol>
+<ul>
+<li>Installs a web server</li>
+<li>Downloads a zip file containing the web application</li>
+<li>Installs the web application</li>
+</ul>
+<h3 id="Launch-the-Instance"><a href="#Launch-the-Instance" class="headerlink" title="Launch the Instance"></a>Launch the Instance</h3><p>啟動 Web Server 實例(包含所有必要信息)<br>27. Run this command to launch the Web Server instance!</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">INSTANCE=$(\</span><br><span class="line">aws ec2 run-instances \</span><br><span class="line">--image-id $AMI \</span><br><span class="line">--subnet-id $SUBNET \</span><br><span class="line">--security-group-ids $SG \</span><br><span class="line">--user-data file:///home/ec2-user/UserData.txt \</span><br><span class="line">--instance-type t2.micro \</span><br><span class="line">--tag-specifications &#x27;ResourceType=instance,Tags=[&#123;Key=Name,Value=Web Server&#125;]&#x27; \</span><br><span class="line">--query &#x27;Instances[*].InstanceId&#x27; \</span><br><span class="line">--output text \</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">echo $INSTANCE</span><br></pre></td></tr></table></figure>
+<ul>
+<li> <code>Image</code>: Uses the AMI value obtained earlier from the Parameter Store</li>
+<li> <code>Subnet</code>: Specifies the Public Subnet obtained earlier and, by association, the VPC in which to launch the instance</li>
+<li> <code>Security Group</code>: Uses the Web Security Group obtained earlier, which permits HTTP access</li>
+<li> <code>User Data</code>: References the User Data script you downloaded, which installs the web application</li>
+<li> <code>Instance Type</code>: Specifies the type of instance to launch</li>
+<li> <code>Tags</code>: Assigns a Name tag with the value of Web Server</li>
+</ul>
+<p>The <code>query</code> parameter specifies that the command should return the Instance ID once the instance is launched.</p>
+<p>The <code>output</code> parameter specifies that the output of the command should be in text. Other output options are json and table.</p>
+<h3 id="Wait-for-the-Instance-to-be-Ready"><a href="#Wait-for-the-Instance-to-be-Ready" class="headerlink" title="Wait for the Instance to be Ready"></a>Wait for the Instance to be Ready</h3><p>我們可以通過管理控制台 (Management Console) 監視實例的狀態，但也可以通過 AWS CLI 查詢狀態。</p>
+<ol start="28">
+<li><p>Run this command</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">aws ec2 describe-instances --instance-ids $ INSTANCE</span><br></pre></td></tr></table></figure>
+<p>All information related to the instance will be displayed in JSON format. Amongst this information is the instance status.</p>
+</li>
+<li><p>Run this command (Specific information can be obtained by using the <code>query</code> parameter.)</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">aws ec2 describe-instances --instance-ids $INSTANCE --query &#x27;Reservations[].Instances[].State.Name&#x27; --output text</span><br></pre></td></tr></table></figure>
+<p>This is the same command but, rather than displaying all information about the instance, only displays the name of the instance State.</p>
+</li>
+</ol>
+<p>This will display a status of <code>pending</code> or <code>running</code>.</p>
+<h5 id="Repeat-the-above-command-until-it-returns-a-status-of-running"><a href="#Repeat-the-above-command-until-it-returns-a-status-of-running" class="headerlink" title="Repeat the above command until it returns a status of running."></a><font color=blue>Repeat the above command until it returns a status of <code>running</code>.</font></h5><h3 id="Test-the-Web-Server"><a href="#Test-the-Web-Server" class="headerlink" title="Test the Web Server"></a>Test the Web Server</h3><ol start="30">
+<li>Run rhis command to test that the web server is working.<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">aws ec2 describe-instances --instance-ids $INSTANCE --query Reservations[].Instances[].PublicDnsName --output text</span><br></pre></td></tr></table></figure>
+<h5 id="This-returns-the-DNS-Name-of-the-instance"><a href="#This-returns-the-DNS-Name-of-the-instance" class="headerlink" title="This returns the DNS Name of the instance."></a><font color=blue>This returns the DNS Name of the instance.</font></h5></li>
+</ol>
+<h5 id="Paste-the-DNS-name-into-a-new-web-browser-tab-then-press-Enter-A-web-page-should-be-displayed-demonstrating-that-the-web-server-was-successfully-launched-and-configured"><a href="#Paste-the-DNS-name-into-a-new-web-browser-tab-then-press-Enter-A-web-page-should-be-displayed-demonstrating-that-the-web-server-was-successfully-launched-and-configured" class="headerlink" title="Paste the DNS name into a new web browser tab, then press Enter.A web page should be displayed, demonstrating that the web server was successfully launched and configured."></a><font color=blue>Paste the DNS name into a new web browser tab, then press Enter.A web page should be displayed, demonstrating that the web server was successfully launched and configured.</font></h5>
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/AWS/" rel="tag"># AWS</a>
+              <a href="/tags/EC2/" rel="tag"># EC2</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/01/18/systems-operations-on-aws/" rel="prev" title="">
+      <i class="fa fa-chevron-left"></i> 
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目錄
+        </li>
+        <li class="sidebar-nav-overview">
+          本站概要
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Launch-an-Amazon-EC2-Instance-using-the-Management-Console"><span class="nav-number">1.</span> <span class="nav-text">Launch an Amazon EC2 Instance using the Management Console</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Step-1-Choose-an-Amazon-Machine-Image-AMI"><span class="nav-number">1.0.1.</span> <span class="nav-text">Step 1: Choose an Amazon Machine Image (AMI)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Step-2-Choose-an-Instance-Type"><span class="nav-number">1.0.2.</span> <span class="nav-text">Step 2: Choose an Instance Type</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Step-3-Configure-Instance-Details"><span class="nav-number">1.0.3.</span> <span class="nav-text">Step 3: Configure Instance Details</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Step-4-Add-Storage"><span class="nav-number">1.0.4.</span> <span class="nav-text">Step 4: Add Storage</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Step-5-Add-Tags"><span class="nav-number">1.0.5.</span> <span class="nav-text">Step 5: Add Tags</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Step-6-Configure-Security-Group"><span class="nav-number">1.0.6.</span> <span class="nav-text">Step 6: Configure Security Group</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Step-7-Review-Instance-Launch"><span class="nav-number">1.0.7.</span> <span class="nav-text">Step 7: Review Instance Launch</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#Your-instance-will-now-be-launched"><span class="nav-number">1.0.7.0.1.</span> <span class="nav-text">Your instance will now be launched.</span></a></li></ol></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Log-into-the-Bastion-Server"><span class="nav-number">2.</span> <span class="nav-text">Log into the Bastion Server</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#Now-that-you-are-connected-to-the-Bastion-Server-you-can-use-the-AWS-CLI-to-create-and-interact-with-your-AWS-resources"><span class="nav-number">2.0.0.0.1.</span> <span class="nav-text">Now that you are connected to the Bastion Server, you can use the AWS CLI to create and interact with your AWS resources.</span></a></li></ol></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Launch-an-Instance-using-the-AWS-CLI"><span class="nav-number">3.</span> <span class="nav-text">Launch an Instance using the AWS CLI</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Obtain-the-AMI-to-Use"><span class="nav-number">3.0.1.</span> <span class="nav-text">Obtain the AMI to Use</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%A6%82%E6%9E%9C-SSH-Session-%E6%96%B7%E9%96%8B%E9%80%A3%E6%8E%A5%EF%BC%8C%E5%AE%83%E5%B0%87%E4%B8%9F%E5%A4%B1%E5%AD%98%E5%84%B2%E5%9C%A8%E7%92%B0%E5%A2%83%E8%AE%8A%E9%87%8F%E4%B8%AD%E7%9A%84%E4%BF%A1%E6%81%AF%E3%80%82%E9%87%8D%E6%96%B0%E9%80%A3%E6%8E%A5%E5%BE%8C%EF%BC%8C%E9%9C%80%E8%A6%81%E9%87%8D%E6%96%B0%E9%81%8B%E8%A1%8C%E4%B8%8A%E8%BF%B0%E5%91%BD%E4%BB%A4%E4%BE%86%E9%87%8D%E6%96%B0%E7%8D%B2%E5%8F%96-AMI-ID%E3%80%82"><span class="nav-number">3.0.1.0.1.</span> <span class="nav-text">如果 SSH Session 斷開連接，它將丟失存儲在環境變量中的信息。重新連接後，需要重新運行上述命令來重新獲取 AMI ID。</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Obtain-the-Subnet-to-Use"><span class="nav-number">3.0.2.</span> <span class="nav-text">Obtain the Subnet to Use</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Obtain-the-Security-Group-to-Use"><span class="nav-number">3.0.3.</span> <span class="nav-text">Obtain the Security Group to Use</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Download-a-User-Data-script"><span class="nav-number">3.0.4.</span> <span class="nav-text">Download a User Data script</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Launch-the-Instance"><span class="nav-number">3.0.5.</span> <span class="nav-text">Launch the Instance</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Wait-for-the-Instance-to-be-Ready"><span class="nav-number">3.0.6.</span> <span class="nav-text">Wait for the Instance to be Ready</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#Repeat-the-above-command-until-it-returns-a-status-of-running"><span class="nav-number">3.0.6.0.1.</span> <span class="nav-text">Repeat the above command until it returns a status of running.</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Test-the-Web-Server"><span class="nav-number">3.0.7.</span> <span class="nav-text">Test the Web Server</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#This-returns-the-DNS-Name-of-the-instance"><span class="nav-number">3.0.7.0.1.</span> <span class="nav-text">This returns the DNS Name of the instance.</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Paste-the-DNS-name-into-a-new-web-browser-tab-then-press-Enter-A-web-page-should-be-displayed-demonstrating-that-the-web-server-was-successfully-launched-and-configured"><span class="nav-number">3.0.7.0.2.</span> <span class="nav-text">Paste the DNS name into a new web browser tab, then press Enter.A web page should be displayed, demonstrating that the web server was successfully launched and configured.</span></a></li></ol></li></ol></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Samuel Huang</p>
+  <div class="site-description" itemprop="description">Samuel Notes</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">6</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">標籤</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Samuel Huang</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 強力驅動
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
