@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"posheng.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="The Docker Quickstart training module teaches you how to:  Set up your Docker environment Build and run your image Share images on Docker Hub  * We also recommend the video walkthrough from Dockercon">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Docker Quickstart(GitLab - AGBS SE)">
+<meta property="og:url" content="https://posheng.github.io/2021/01/19/docker-gitlab-agbs-se/index.html">
+<meta property="og:site_name" content="Samuel&#39;s Blog">
+<meta property="og:description" content="The Docker Quickstart training module teaches you how to:  Set up your Docker environment Build and run your image Share images on Docker Hub  * We also recommend the video walkthrough from Dockercon">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://docs.docker.com/images/Container%402x.png">
+<meta property="og:image" content="https://docs.docker.com/images/VM%402x.png">
+<meta property="og:image" content="https://docs.docker.com/get-started/images/newrepo.png">
+<meta property="article:published_time" content="2021-01-18T16:00:00.000Z">
+<meta property="article:modified_time" content="2021-01-25T06:21:58.869Z">
+<meta property="article:author" content="Samuel Huang">
+<meta property="article:tag" content="Docker">
+<meta property="article:tag" content="GitLab">
+<meta property="article:tag" content="AGBS SE">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://docs.docker.com/images/Container%402x.png">
+
+<link rel="canonical" href="https://posheng.github.io/2021/01/19/docker-gitlab-agbs-se/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-TW'
+  };
+</script>
+
+  <title>Docker Quickstart(GitLab - AGBS SE) | Samuel's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切換導航欄">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Samuel's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">For the worldwide martial arts, there is no one impregnable, only the swiftness is invincible</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首頁</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>標籤</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>歸檔</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://posheng.github.io/2021/01/19/docker-gitlab-agbs-se/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Samuel Huang">
+      <meta itemprop="description" content="Samuel Notes">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Samuel's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Docker Quickstart(GitLab - AGBS SE)
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">發表於</span>
+
+              <time title="創建時間：2021-01-19 00:00:00" itemprop="dateCreated datePublished" datetime="2021-01-19T00:00:00+08:00">2021-01-19</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新於</span>
+                <time title="修改時間：2021-01-25 14:21:58" itemprop="dateModified" datetime="2021-01-25T14:21:58+08:00">2021-01-25</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>The Docker Quickstart training module teaches you how to:</p>
+<ol>
+<li>Set up your Docker environment</li>
+<li>Build and run your image</li>
+<li>Share images on Docker Hub</li>
+</ol>
+<p><a target="_blank" rel="noopener" href="https://youtu.be/iqqDU2crIEQ">* We also recommend the video walkthrough from Dockercon 2020.</a></p>
+<a id="more"></a>
+<hr>
+<h1 id="Orientation-and-setup"><a href="#Orientation-and-setup" class="headerlink" title="Orientation and setup"></a>Orientation and setup</h1><h2 id="Docker-Concepts"><a href="#Docker-Concepts" class="headerlink" title="Docker Concepts"></a>Docker Concepts</h2><p>Containerization is increasingly popular because containers are:</p>
+<ul>
+<li><strong><code>Flexible</code></strong>: Even the most complex applications can be containerized.</li>
+<li><strong><code>Lightweight</code></strong>: Containers leverage and share the host kernel, making them much more efficient in terms of system resources than virtual machines.<br>Portable: You can build locally, deploy to the cloud, and run anywhere.</li>
+<li><strong><code>Loosely coupled</code></strong>: Containers are highly self sufficient and encapsulated, allowing you to replace or upgrade one without disrupting others.</li>
+<li><strong><code>Scalable</code></strong>: You can increase and automatically distribute container replicas across a datacenter.</li>
+<li><strong><code>Secure</code></strong>: Containers apply aggressive constraints and isolations to processes without any configuration required on the part of the user.</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">我寫好了一支程式，在我的電腦上可以正常運作，但搬到你的電腦上可能就爆掉</span><br></pre></td></tr></table></figure>
+<h3 id="Images-Containers-and-Repository"><a href="#Images-Containers-and-Repository" class="headerlink" title="Images, Containers and Repository"></a>Images, Containers and Repository</h3><p>Fundamentally, a container is nothing but a running process, with some added encapsulation features applied to it in order to keep it isolated from the host and from other containers. One of the most important aspects of container isolation is that each container interacts with its own private filesystem; this filesystem is provided by a Docker image. An image includes everything needed to run an application - the code or binary, runtimes, dependencies, and any other filesystem objects required.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">如果映像檔(Image)是一個做蛋糕的模具，容器(Container)則是用該模具烤出來的蛋糕，而倉庫(Repository)是用來集中放置模具們的收納櫃</span><br></pre></td></tr></table></figure>
+<h3 id="Containers-and-virtual-machines"><a href="#Containers-and-virtual-machines" class="headerlink" title="Containers and virtual machines"></a>Containers and virtual machines</h3><p>A container runs natively on Linux and <strong><code>shares the kernel of the host machine with other containers</code></strong>. It runs a discrete process, taking no more memory than any other executable, making it <strong><code>lightweight</code></strong>.<br><img src="https://docs.docker.com/images/Container%402x.png" width=300 height=268.95 /></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">直接從 Docker Hub Pull 作業系統的 Image</span><br><span class="line">不用開機，啟動速度比 VM 快</span><br><span class="line">底層還是使用作業系統的 Kernel</span><br><span class="line">佔用硬碟的容量較小</span><br></pre></td></tr></table></figure>
+<p>By contrast, a virtual machine (VM) runs a full-blown “guest” operating system with virtual <strong><code>access to host resources</code></strong> through a hypervisor. In general, VMs incur a lot of overhead beyond what is being consumed by your application logic.<br><img src="https://docs.docker.com/images/VM%402x.png" width=300 height=269.61 /></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">需要安裝作業系統</span><br><span class="line">VM 裡面的作業系統開機需要花一點時間開機</span><br><span class="line">完全的把系統的硬體資源隔離</span><br><span class="line">佔用硬碟的容量較大</span><br></pre></td></tr></table></figure>
+<h2 id="Set-up-your-Docker-environment"><a href="#Set-up-your-Docker-environment" class="headerlink" title="Set up your Docker environment"></a>Set up your Docker environment</h2><h3 id="Download-and-install-Docker-Desktop"><a href="#Download-and-install-Docker-Desktop" class="headerlink" title="Download and install Docker Desktop"></a>Download and install Docker Desktop</h3><p>Docker Desktop is an easy-to-install application for your Mac or Windows environment that enables you to start coding and containerizing in minutes. Docker Desktop includes everything you need to build, run, and share containerized applications right from your machine.</p>
+<p>Follow the instructions appropriate for your operating system to download and install Docker Desktop.<br><a target="_blank" rel="noopener" href="https://docs.docker.com/docker-for-mac/install/"><strong><code>Docker Desktop on Mac</code></strong></a> <a target="_blank" rel="noopener" href="https://docs.docker.com/docker-for-windows/install/"><strong><code>Docker Desktop on Windows</code></strong></a></p>
+<h3 id="Test-Docker-version"><a href="#Test-Docker-version" class="headerlink" title="Test Docker version"></a>Test Docker version</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ docker --version</span><br><span class="line">or</span><br><span class="line">$ docker -v</span><br><span class="line">Docker version 19.03.13, build 4484c46d9d</span><br></pre></td></tr></table></figure>
+<h3 id="Test-Docker-installation"><a href="#Test-Docker-installation" class="headerlink" title="Test Docker installation"></a>Test Docker installation</h3><ol>
+<li>Test that your installation works by running the hello-world Docker image: <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">$ docker run hello-world</span><br><span class="line">Unable to find image &#39;hello-world:latest&#39; locally</span><br><span class="line">latest: Pulling from library&#x2F;hello-world</span><br><span class="line">0e03bdcc26d7: Pull complete</span><br><span class="line">Digest: sha256:e7c70bb24b462baa86c102610182e3efcb12a04854e8c582838d92970a09f323</span><br><span class="line">Status: Downloaded newer image for hello-world:latest</span><br><span class="line">...</span><br><span class="line">..</span><br><span class="line">.</span><br></pre></td></tr></table></figure></li>
+<li>Run <strong><code>docker image ls</code></strong> to list the <strong><code>hello-world</code></strong> image that you downloaded to your machine.</li>
+<li>List the hello-world container (spawned by the image) which exits after displaying its message. If it is still running, you do not need the –all option: <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">$ docker ps --all</span><br><span class="line">or</span><br><span class="line">$ docker ps -a</span><br><span class="line">CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS                     PORTS               NAMES</span><br><span class="line">a2b6683de53a        hello-world         &quot;&#x2F;hello&quot;            3 minutes ago       Exited (0) 3 minutes ago                       loving_banach</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<hr>
+<h1 id="Build-and-run-your-image"><a href="#Build-and-run-your-image" class="headerlink" title="Build and run your image"></a>Build and run your image</h1><h2 id="Introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a>Introduction</h2><p>The development workflow looks like this:</p>
+<ol>
+<li>Create and test individual containers for each component of your application by first creating Docker images.</li>
+<li>Assemble your containers and supporting infrastructure into a complete application.</li>
+<li>Test, share, and deploy your complete containerized application.</li>
+</ol>
+<p>In this stage of the tutorial, let’s focus on step 1 of this workflow: <strong><code>creating the images that your containers will be based on</code></strong>. Remember, a Docker image captures the private filesystem that your containerized processes will run in; you need to create an image that contains just what your application needs to run.</p>
+<h2 id="Git-clone-example"><a href="#Git-clone-example" class="headerlink" title="Git clone example"></a>Git clone example</h2><p>Clone the example project from GitHub:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">$ git clone https:&#x2F;&#x2F;github.com&#x2F;posheng&#x2F;node-bulletin-board.git</span><br><span class="line">Cloning into &#39;node-bulletin-board&#39;...</span><br><span class="line">remote: Enumerating objects: 152, done.</span><br><span class="line">remote: Total 152 (delta 0), reused 0 (delta 0), pack-reused 152</span><br><span class="line">Receiving objects: 100% (152&#x2F;152), 190.11 KiB | 394.00 KiB&#x2F;s, done.</span><br><span class="line">Resolving deltas: 100% (69&#x2F;69), done.</span><br><span class="line"></span><br><span class="line">$ cd node-bulletin-board&#x2F;bulletin-board-app</span><br></pre></td></tr></table></figure>
+<h2 id="Define-a-container-with-Dockerfile"><a href="#Define-a-container-with-Dockerfile" class="headerlink" title="Define a container with Dockerfile"></a>Define a container with Dockerfile</h2><p>After downloading the project, take a look at the file called Dockerfile in the bulletin board application. Dockerfiles describe how to assemble a private filesystem for a container, and can also contain some metadata describing how to run a container based on this image.</p>
+<p>For more information about the Dockerfile used in the bulletin board application, see <a target="_blank" rel="noopener" href="https://docs.docker.com/get-started/part2/#sample-dockerfile">Sample Dockerfile</a>.</p>
+<h2 id="Sample-Dockerfile"><a href="#Sample-Dockerfile" class="headerlink" title="Sample Dockerfile"></a>Sample Dockerfile</h2><p>Writing a Dockerfile is the first step to containerizing an application. You can think of these Dockerfile commands as a step-by-step recipe on how to build up your image. The Dockerfile in the bulletin board app looks like this:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"># Use the official image as a parent image.</span><br><span class="line">FROM node:current-slim</span><br><span class="line"></span><br><span class="line"># Set the working directory.</span><br><span class="line">WORKDIR &#x2F;usr&#x2F;src&#x2F;app</span><br><span class="line"></span><br><span class="line"># Copy the file from your host to your current location.</span><br><span class="line">COPY package.json .</span><br><span class="line"></span><br><span class="line"># Run the command inside your image filesystem.</span><br><span class="line">RUN npm install</span><br><span class="line"></span><br><span class="line"># Add metadata to the image to describe which port the container is listening on at runtime.</span><br><span class="line">EXPOSE 8080</span><br><span class="line"></span><br><span class="line"># Run the specified command within the container.</span><br><span class="line">CMD [ &quot;npm&quot;, &quot;start&quot; ]</span><br><span class="line"></span><br><span class="line"># Copy the rest of your app&#39;s source code from your host to your image filesystem.</span><br><span class="line">COPY . .</span><br></pre></td></tr></table></figure>
+<p>The dockerfile defined in this example takes the following steps:</p>
+<ul>
+<li>Start <strong><code>FROM</code></strong> the pre-existing <strong><code>node:current-slim</code></strong> image. This is an official image, built by the node.js vendors and validated by Docker to be a high-quality image containing the Node.js Long Term Support (LTS) interpreter and basic dependencies.(<strong><code>docker search --filter is-official=true node</code></strong> or <a target="_blank" rel="noopener" href="https://hub.docker.com/search?q=&type=image">Docker Hub Explore</a>)</li>
+<li>Use <strong><code>WORKDIR</code></strong> to specify that all subsequent actions should be taken from the directory <strong><code>/usr/src/app</code></strong> in your image filesystem (never the host’s filesystem).</li>
+<li><strong><code>COPY</code></strong> the file <strong><code>package.json</code></strong> from your host to the present location <strong><code>(.)</code></strong> in your image (so in this case, to <strong><code>/usr/src/app/package.json</code></strong>)</li>
+<li><strong><code>RUN</code></strong> the command <strong><code>npm install</code></strong> inside your image filesystem (which will read <strong><code>package.json</code></strong> to determine your app’s node dependencies, and install them)</li>
+<li><strong><code>COPY</code></strong> in the rest of your app’s source code from your host to your image filesystem.</li>
+</ul>
+<p>The <strong><code>CMD</code></strong> directive is the first example of specifying some metadata in your image that describes how to run a container based on this image. In this case, it’s saying that the containerized process that this image is meant to support is <strong><code>npm start</code></strong>.</p>
+<p>The <strong><code>EXPOSE 8080</code></strong> informs Docker that the container is listening on port 8080 at runtime.</p>
+<p>What you see above is a good way to organize a simple Dockerfile; always start with a <strong><code>FROM</code></strong> command, follow it with the steps to build up your private filesystem, and conclude with <strong><code>any metadata</code></strong> specifications. There are many more Dockerfile directives than just the few you see above. For a complete list, see the <a target="_blank" rel="noopener" href="https://docs.docker.com/engine/reference/builder/">Dockerfile reference</a>.</p>
+<h2 id="Build-and-test-your-image"><a href="#Build-and-test-your-image" class="headerlink" title="Build and test your image"></a>Build and test your image</h2><p><strong>Make sure you’re in the directory node-bulletin-board/bulletin-board-app in a terminal or PowerShell</strong> using the cd command. Run the following command to build your bulletin board image:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ docker build --tag bulletinboard:1.0 .</span><br><span class="line">or</span><br><span class="line">$ docker build -t bulletinboard:1.0 .</span><br></pre></td></tr></table></figure>
+<p>You’ll see Docker step through each instruction in your Dockerfile, building up your image as it goes. If successful, the build process should end with a message <strong><code>Successfully tagged bulletinboard:1.0</code></strong>.</p>
+<h2 id="Run-your-image-as-a-container"><a href="#Run-your-image-as-a-container" class="headerlink" title="Run your image as a container"></a>Run your image as a container</h2><ol>
+<li>Run the following command to start a container based on your new image: <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">docker run --publish 8000:8080 --detach --name bb bulletinboard:1.0</span><br><span class="line">or </span><br><span class="line">docker run -p 8000:8080 -d --name bb bulletinboard:1.0</span><br><span class="line">or</span><br><span class="line">docker run -p 8000:8080 -d --name bb &lt;Your Docker ID&gt;</span><br></pre></td></tr></table></figure>
+ There are a couple of common flags here:<ul>
+<li><strong><code>-p, --publish</code></strong> : Publish a container’s port(s) to the host</li>
+<li><strong><code>-d, --detach</code></strong> : Run container in background and print container ID</li>
+<li><strong><code>--name</code></strong> : Assign a name to the container<br>bulletinboard:1.0 : image name</li>
+</ul>
+</li>
+<li>Visit your application in a browser at <strong><code>localhost:8000</code></strong>. You should see your bulletin board application up and running. At this step, you would normally do everything you could to ensure your container works the way you expected; now would be the time to run unit tests, for example.</li>
+<li>Once you’re satisfied that your bulletin board container works correctly, you can delete it: <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ docker rm --force bb</span><br><span class="line">or</span><br><span class="line">$ docker rm -f bb</span><br></pre></td></tr></table></figure>
+ The <strong><code>--force</code></strong> option stops a running container, so it can be removed. If you stop the container running with <strong><code>docker stop bb</code></strong> first, then you do not need to use <strong><code>--force</code></strong> to remove it.</li>
+</ol>
+<h2 id="Deploying-to-the-cloud"><a href="#Deploying-to-the-cloud" class="headerlink" title="Deploying to the cloud"></a><font color=red>Deploying to the cloud</font></h2><p>To run your containers in the cloud with either Azure or AWS, check out our docs on getting started with cloud deployments.<br><a target="_blank" rel="noopener" href="https://docs.docker.com/engine/context/ecs-integration/">* Deploying with Docker and AWS</a><br><a target="_blank" rel="noopener" href="https://docs.docker.com/engine/context/aci-integration/">* Deploying with Docker and Azure</a></p>
+<hr>
+<h1 id="Share-images-on-Docker-Hub"><a href="#Share-images-on-Docker-Hub" class="headerlink" title="Share images on Docker Hub"></a>Share images on Docker Hub</h1><h2 id="Introduction-1"><a href="#Introduction-1" class="headerlink" title="Introduction"></a>Introduction</h2><p>The final step in developing a containerized application is to share your images on a registry like <a target="_blank" rel="noopener" href="https://hub.docker.com/">Docker Hub</a>, so they can be easily downloaded and run on any destination machine.</p>
+<h2 id="Set-up-your-Docker-Hub-account"><a href="#Set-up-your-Docker-Hub-account" class="headerlink" title="Set up your Docker Hub account"></a>Set up your Docker Hub account</h2><p>If you don’t have a Docker ID, follow these steps to create one. A Docker ID allows you to share images on Docker Hub.</p>
+<ol>
+<li>Visit the <a target="_blank" rel="noopener" href="https://hub.docker.com/signup">Docker Hub sign up</a> page.</li>
+<li>Fill out the form and submit to create your Docker ID.</li>
+<li>Verify your email address to complete the registration process.</li>
+<li>Click on the Docker icon in your toolbar or system tray, and click Sign in / Create Docker ID.</li>
+<li>Fill in your new Docker ID and password. After you have successfully authenticated, your Docker ID appears in the Docker Desktop menu in place of the ‘Sign in’ option you just used.</li>
+</ol>
+<ul>
+<li>You can also sign into Docker Hub from the command line by typing <strong><code>docker login</code></strong>.</li>
+</ul>
+<h2 id="Create-a-Docker-Hub-repository-and-push-your-image"><a href="#Create-a-Docker-Hub-repository-and-push-your-image" class="headerlink" title="Create a Docker Hub repository and push your image"></a>Create a Docker Hub repository and push your image</h2><p>Now let’s create your first repository, and push your bulletin board image to Docker Hub.</p>
+<ol>
+<li><p>Click on the Docker icon in your menu bar, and navigate to <strong><code>Repositories &gt; Create</code></strong>. You’ll be redirected to the <strong><code>Create Repository</code></strong> page on Docker Hub.</p>
+</li>
+<li><p>Type the repository name as <strong><code>bulletinboard</code></strong> and click Create at the bottom of the page. Do not fill any other details for now.</p>
+ <img src="https://docs.docker.com/get-started/images/newrepo.png" width=807 height=581.34 /></li>
+<li><p>You are now ready to share your image on Docker Hub, however, there’s one thing you must do first: images must be namespaced correctly to share on Docker Hub. Specifically, you must name images like <strong><code>&lt;Your Docker ID&gt;/&lt;Repository Name&gt;:&lt;tag&gt;</code></strong>.</p>
+<p> Make sure you’re in the <strong><code>node-bulletin-board/bulletin-board-app</code></strong> directory in a terminal or PowerShell then and run:</p>
+ <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ docker tag bulletinboard:1.0 &lt;Your Docker ID&gt;&#x2F;bulletinboard:1.0</span><br><span class="line">$ docker tag bulletinboard:1.0 paisheng&#x2F;bulletinboard:1.0</span><br></pre></td></tr></table></figure></li>
+<li><p>Finally, push your image to Docker Hub:</p>
+ <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ docker push &lt;Your Docker ID&gt;&#x2F;bulletinboard:1.0</span><br><span class="line">$ docker push paisheng&#x2F;bulletinboard:1.0</span><br></pre></td></tr></table></figure>
+<p>Visit your repository in Docker Hub, and you’ll see your new image there. Remember, Docker Hub repositories are public by default.</p>
+</li>
+</ol>
+<hr>
+<p>docker save -o <code>&lt;path for generated tar file&gt;</code> <code>&lt;image name&gt;</code><br>docker save -o wildfly-agbsejb-mobile-qa.tar 10.36.22.88:5000/wildfly-agbsejb-mobile-qa:latest<br>docker save -o wildfly-ha-agbsejb.tar 10.36.22.88:5000/wildfly-ha-agbsejb:18.0.1.Final</p>
+<p>docker load -i <code>&lt;path to image tar file&gt;</code><br>docker load -i wildfly-agbsejb-mobile-qa.tar<br>docker load -i wildfly-ha-agbsejb.tar</p>
+<p>docker tag bulletinboard:1.0 <code>&lt;Your Docker ID&gt;</code>/bulletinboard:1.0<br>docker tag 10.36.22.88:5000/wildfly-ha-agbsejb:18.0.1.Final paisheng/wildfly-ha-agbsejb:18.0.1.Final<br>docker push paisheng/wildfly-ha-agbsejb:18.0.1.Final</p>
+<h2 id="image-QA-stage-build-image"><a href="#image-QA-stage-build-image" class="headerlink" title="image-QA: stage: build-image"></a>image-QA: stage: build-image</h2><p>export JAVA_HOME=/Library/Java/JavaVirtualMachines/jdk1.8.0_45.jdk/Contents/Home<br>mvn –batch-mode -Dmaven.wagon.http.ssl.insecure=true clean -U -Pdevelop<br>mvn –batch-mode -Dmaven.wagon.http.ssl.insecure=true clean package -DskipTests -Pdevelop<br>chmod +x build-image.sh<br>./build-image.sh 0.0.1 paisheng/wildfly-agbsejb-mobile-qa 558abd57</p>
+<p>VER=0.0.1<br>IMAGE=paisheng/wildfly-agbsejb-mobile-qa<br>ORG_TAG=paisheng/wildfly-agbsejb-mobile-qa:0.0.1<br>SHORT_SHA=558abd57<br>TAG=paisheng/wildfly-agbsejb-mobile-qa:0.0.1-558abd57</p>
+<p>docker pull paisheng/wildfly-agbsejb-mobile-qa:0.0.1-558abd57<br>docker build -t paisheng/wildfly-agbsejb-mobile-qa:0.0.1-558abd57 .</p>
+<p>docker tag paisheng/wildfly-agbsejb-mobile-qa:0.0.1-558abd57 paisheng/wildfly-agbsejb-mobile-qa:latest<br>docker push aisheng/wildfly-agbsejb-mobile-qa:0.0.1-558abd57<br>docker push aisheng/wildfly-agbsejb-mobile-qa:latest</p>
+<h2 id="restart-QA-stage-updateQA"><a href="#restart-QA-stage-updateQA" class="headerlink" title="restart-QA: stage: updateQA"></a>restart-QA: stage: updateQA</h2><p>/app/jbHome/agbsejb-mobile.sh restart 0.0.1-558abd57<br>./agbsejb-mobile.sh restart 0.0.1-558abd57</p>
+<h3 id="stop-server"><a href="#stop-server" class="headerlink" title="stop_server"></a>stop_server</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker stop wildfly-agbsejb-mobile-qa</span><br></pre></td></tr></table></figure>
+<h3 id="retry-start-server-gt-start-server"><a href="#retry-start-server-gt-start-server" class="headerlink" title="retry_start_server -&gt; start_server"></a>retry_start_server -&gt; start_server</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker run --restart&#x3D;always -d --name $SERVER_NAME -h $HOST_NAME -p $BIND_IP:8080:8080 -p $BIND_IP:9990:9990 -p $BIND_IP:7600:7600 $ENV_VARIABLES -e JAVA_OPTS&#x3D;&quot;$JAVA_OPTS&quot; -v &#x2F;app&#x2F;jbHome&#x2F;$ENV&#x2F;source:&#x2F;opt&#x2F;jboss&#x2F;source -v &#x2F;app&#x2F;jbHome&#x2F;$ENV&#x2F;log:&#x2F;opt&#x2F;jboss&#x2F;wildfly&#x2F;standalone&#x2F;log $IMAGE</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker run --restart&#x3D;always -d --name wildfly-agbsejb-mobile-qa -p 8080:8080 -p 9990:9990 -p 7600:7600 -e JAVA_OPTS&#x3D;&quot;-server -Xms6G -Xmx14G -XX:MetaspaceSize&#x3D;2G -XX:MaxMetaspaceSize&#x3D;2G -XX:CompressedClassSpaceSize&#x3D;1G -XX:+DisableExplicitGC -Djava.net.preferIPv4Stack&#x3D;true -Djboss.modules.system.pkgs&#x3D;org.jboss.byteman,org.jboss.logmanager.LogManager -Djava.awt.headless&#x3D;true -Duser.timezone&#x3D;GMT+8&quot; -v &#x2F;Users&#x2F;paishenghuang&#x2F;app&#x2F;jbHome&#x2F;qa&#x2F;source:&#x2F;opt&#x2F;jboss&#x2F;source -v &#x2F;Users&#x2F;paishenghuang&#x2F;app&#x2F;jbHome&#x2F;qa&#x2F;log:&#x2F;opt&#x2F;jboss&#x2F;wildfly&#x2F;standalone&#x2F;log paisheng&#x2F;wildfly-agbsejb-mobile-qa:0.0.1-ffc5afed</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">JAVA_OPTS&#x3D;&#96;-server -Xms6G -Xmx14G -XX:MetaspaceSize&#x3D;2G -XX:MaxMetaspaceSize&#x3D;2G -XX:CompressedClassSpaceSize&#x3D;1G -XX:+DisableExplicitGC -Djava.net.preferIPv4Stack&#x3D;true -Djboss.modules.system.pkgs&#x3D;org.jboss.byteman,org.jboss.logmanager.LogManager -Djava.awt.headless&#x3D;true -Duser.timezone&#x3D;GMT+8&#96;</span><br><span class="line"></span><br><span class="line">ENV_VARIABLES&#x3D;&#96;-e NODE_NAME&#x3D;ip-10-36-26-182 -e SERVER_CONFIG&#x3D;standalone-ha.xml -e MGMT_USER&#x3D;admin -e MGMT_PASS&#x3D;*** -e APP_USER&#x3D;jboss -e APP_PASS&#x3D;*** -e JAEGER_SERVICE_NAME&#x3D;wildfly-agbsejb-mobile-qa -e JAEGER_SAMPLER_TYPE&#x3D;const -e JAEGER_SAMPLER_PARAM&#x3D;1 -e JAEGER_REPORTER_LOG_SPANS&#x3D;false -e JAEGER_ENDPOINT&#x3D;http:&#x2F;&#x2F;10.36.24.37:14268&#x2F;api&#x2F;traces&#96;</span><br><span class="line"></span><br><span class="line">$IMAGE&#x3D;&#96;paisheng&#x2F;wildfly-agbsejb-mobile-qa:0.0.1-558abd57&#96;</span><br><span class="line">$SERVER_NAME&#x3D;&#96;wildfly-agbsejb-mobile-qa&#96;</span><br><span class="line">$HOST_NAME&#x3D;&#96;ip-192.168.50.17&#96;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">docker run </span><br><span class="line">--restart&#x3D;always </span><br><span class="line">-d </span><br><span class="line">--name wildfly-agbsejb-mobile-qa </span><br><span class="line">-h ip-192.168.50.17 </span><br><span class="line">-p 192.168.50.17:8080:8080 </span><br><span class="line">-p 192.168.50.17:9990:9990 </span><br><span class="line">-p 192.168.50.17:7600:7600 </span><br><span class="line">$ENV_VARIABLES </span><br><span class="line">-e JAVA_OPTS&#x3D;&quot;-server -Xms6G -Xmx14G -XX:MetaspaceSize&#x3D;2G -XX:MaxMetaspaceSize&#x3D;2G -XX:CompressedClassSpaceSize&#x3D;1G -XX:+DisableExplicitGC -Djava.net.preferIPv4Stack&#x3D;true -Djboss.modules.system.pkgs&#x3D;org.jboss.byteman,org.jboss.logmanager.LogManager -Djava.awt.headless&#x3D;true -Duser.timezone&#x3D;GMT+8&quot; </span><br><span class="line">-v &#x2F;Users&#x2F;paishenghuang&#x2F;app&#x2F;jbHome&#x2F;qa&#x2F;source:&#x2F;opt&#x2F;jboss&#x2F;source </span><br><span class="line">-v &#x2F;Users&#x2F;paishenghuang&#x2F;app&#x2F;jbHome&#x2F;qa&#x2F;log:&#x2F;opt&#x2F;jboss&#x2F;wildfly&#x2F;standalone&#x2F;log </span><br><span class="line">paisheng&#x2F;wildfly-agbsejb-mobile-qa:0.0.1-558abd57</span><br></pre></td></tr></table></figure>
+<p>docker run -d –name wildfly-agbsejb-mobile-qa -h ip-192.168.50.17 -p 192.168.50.17:8080:8080 -p 192.168.50.17:9990:9990 -p 192.168.50.17:7600:7600 -e JAVA_OPTS=”-server -Xms6G -Xmx14G -XX:MetaspaceSize=2G -XX:MaxMetaspaceSize=2G -XX:CompressedClassSpaceSize=1G -XX:+DisableExplicitGC -Djava.net.preferIPv4Stack=true -Djboss.modules.system.pkgs=org.jboss.byteman,org.jboss.logmanager.LogManager -Djava.awt.headless=true -Duser.timezone=GMT+8” -v /Users/paishenghuang/app/jbHome/qa/source:/opt/jboss/source -v /Users/paishenghuang/app/jbHome/qa/log:/opt/jboss/wildfly/standalone/log paisheng/wildfly-agbsejb-mobile-qa:0.0.1-558abd57</p>
+<p>docker run -d –net=bridge -p 8080:8080 -p 9990:9990 -p 7600:7600 -e JAVA_OPTS=”-server -Xms1G -Xmx1G -XX:MetaspaceSize=2G -XX:MaxMetaspaceSize=2G -XX:CompressedClassSpaceSize=1G -XX:+DisableExplicitGC -Djava.net.preferIPv4Stack=true -Djboss.modules.system.pkgs=org.jboss.byteman,org.jboss.logmanager.LogManager -Djava.awt.headless=true -Duser.timezone=GMT+8” -e SERVER_CONFIG=standalone-ha.xml -e MGMT_USER=admin -e MGMT_PASS=jb0$$eap7 -e APP_USER=jboss -e APP_PASS=eap7-ejb3 -v /Users/paishenghuang/app/jbHome/qa/source:/opt/jboss/source -v /Users/paishenghuang/app/jbHome/qa/log:/opt/jboss/wildfly/standalone/log paisheng/wildfly-agbsejb-mobile-qa:0.0.1-558abd57</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Docker/" rel="tag"># Docker</a>
+              <a href="/tags/GitLab/" rel="tag"># GitLab</a>
+              <a href="/tags/AGBS-SE/" rel="tag"># AGBS SE</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/01/18/systems-operations-on-aws/" rel="prev" title="">
+      <i class="fa fa-chevron-left"></i> 
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/01/19/creating-amazon-ec2-instances-linux/" rel="next" title="Creating Amazon EC2 Instances (Linux)">
+      Creating Amazon EC2 Instances (Linux) <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目錄
+        </li>
+        <li class="sidebar-nav-overview">
+          本站概要
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Orientation-and-setup"><span class="nav-number">1.</span> <span class="nav-text">Orientation and setup</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Docker-Concepts"><span class="nav-number">1.1.</span> <span class="nav-text">Docker Concepts</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Images-Containers-and-Repository"><span class="nav-number">1.1.1.</span> <span class="nav-text">Images, Containers and Repository</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Containers-and-virtual-machines"><span class="nav-number">1.1.2.</span> <span class="nav-text">Containers and virtual machines</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Set-up-your-Docker-environment"><span class="nav-number">1.2.</span> <span class="nav-text">Set up your Docker environment</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Download-and-install-Docker-Desktop"><span class="nav-number">1.2.1.</span> <span class="nav-text">Download and install Docker Desktop</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Test-Docker-version"><span class="nav-number">1.2.2.</span> <span class="nav-text">Test Docker version</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Test-Docker-installation"><span class="nav-number">1.2.3.</span> <span class="nav-text">Test Docker installation</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Build-and-run-your-image"><span class="nav-number">2.</span> <span class="nav-text">Build and run your image</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Introduction"><span class="nav-number">2.1.</span> <span class="nav-text">Introduction</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Git-clone-example"><span class="nav-number">2.2.</span> <span class="nav-text">Git clone example</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Define-a-container-with-Dockerfile"><span class="nav-number">2.3.</span> <span class="nav-text">Define a container with Dockerfile</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Sample-Dockerfile"><span class="nav-number">2.4.</span> <span class="nav-text">Sample Dockerfile</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Build-and-test-your-image"><span class="nav-number">2.5.</span> <span class="nav-text">Build and test your image</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Run-your-image-as-a-container"><span class="nav-number">2.6.</span> <span class="nav-text">Run your image as a container</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Deploying-to-the-cloud"><span class="nav-number">2.7.</span> <span class="nav-text">Deploying to the cloud</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Share-images-on-Docker-Hub"><span class="nav-number">3.</span> <span class="nav-text">Share images on Docker Hub</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Introduction-1"><span class="nav-number">3.1.</span> <span class="nav-text">Introduction</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Set-up-your-Docker-Hub-account"><span class="nav-number">3.2.</span> <span class="nav-text">Set up your Docker Hub account</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Create-a-Docker-Hub-repository-and-push-your-image"><span class="nav-number">3.3.</span> <span class="nav-text">Create a Docker Hub repository and push your image</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#image-QA-stage-build-image"><span class="nav-number">3.4.</span> <span class="nav-text">image-QA: stage: build-image</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#restart-QA-stage-updateQA"><span class="nav-number">3.5.</span> <span class="nav-text">restart-QA: stage: updateQA</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#stop-server"><span class="nav-number">3.5.1.</span> <span class="nav-text">stop_server</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#retry-start-server-gt-start-server"><span class="nav-number">3.5.2.</span> <span class="nav-text">retry_start_server -&gt; start_server</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Samuel Huang</p>
+  <div class="site-description" itemprop="description">Samuel Notes</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">7</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-name">標籤</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Samuel Huang</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 強力驅動
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
