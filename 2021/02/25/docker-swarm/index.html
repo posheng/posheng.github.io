@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"posheng.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="简介Docker Swarm 是 Docker 的集群管理工具。它將 Docker 主機池轉變為單個虛擬 Docker 主機。 Docker Swarm 提供了標準的 Docker API，所有任何已經與 Docker 守護程序通信的工具都可以使用 Swarm 輕鬆地擴展到多個主機。 支持的工具包括但不限於以下各項：  Dokku Docker Compose Docker Machine Jen">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Docker Swarm 集群管理">
+<meta property="og:url" content="https://posheng.github.io/2021/02/25/docker-swarm/index.html">
+<meta property="og:site_name" content="Samuel&#39;s Blog">
+<meta property="og:description" content="简介Docker Swarm 是 Docker 的集群管理工具。它將 Docker 主機池轉變為單個虛擬 Docker 主機。 Docker Swarm 提供了標準的 Docker API，所有任何已經與 Docker 守護程序通信的工具都可以使用 Swarm 輕鬆地擴展到多個主機。 支持的工具包括但不限於以下各項：  Dokku Docker Compose Docker Machine Jen">
+<meta property="og:locale" content="zh_TW">
+<meta property="article:published_time" content="2021-02-25T02:47:33.786Z">
+<meta property="article:modified_time" content="2021-02-25T05:57:39.056Z">
+<meta property="article:author" content="Samuel Huang">
+<meta property="article:tag" content="Docker">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://posheng.github.io/2021/02/25/docker-swarm/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-TW'
+  };
+</script>
+
+  <title>Docker Swarm 集群管理 | Samuel's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切換導航欄">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Samuel's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">For the worldwide martial arts, there is no one impregnable, only the swiftness is invincible</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首頁</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>標籤</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>歸檔</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://posheng.github.io/2021/02/25/docker-swarm/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Samuel Huang">
+      <meta itemprop="description" content="Samuel Notes">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Samuel's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Docker Swarm 集群管理
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">發表於</span>
+              
+
+              <time title="創建時間：2021-02-25 10:47:33 / 修改時間：13:57:39" itemprop="dateCreated datePublished" datetime="2021-02-25T10:47:33+08:00">2021-02-25</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h3 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h3><p>Docker Swarm 是 Docker 的集群管理工具。它將 Docker 主機池轉變為單個虛擬 Docker 主機。 Docker Swarm 提供了標準的 Docker API，所有任何已經與 Docker 守護程序通信的工具都可以使用 Swarm 輕鬆地擴展到多個主機。</p>
+<p>支持的工具包括但不限於以下各項：</p>
+<ul>
+<li>Dokku</li>
+<li>Docker Compose</li>
+<li>Docker Machine</li>
+<li>Jenkins</li>
+</ul>
+<a id="more"></a>
+<h3 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h3><p>Swarm 集群由管理節點（manager）和工作節點（work node）構成。</p>
+<p><code>swarm mananger</code>：負責整個集群的管理工作包括集群配置、服務管理等所有跟集群有關的工作。<br><code>work node</code>：即圖中的 available node，主要負責運行相應的服務來執行任務（task）。</p>
+<h3 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h3><p>接下來的操作都是使用 Docker Machine 和 virtualbox 進行介紹，確保你的主機已安裝 virtualbox。</p>
+<h5 id="1-創建-swarm-集群管理節點（manager）"><a href="#1-創建-swarm-集群管理節點（manager）" class="headerlink" title="1.創建 swarm 集群管理節點（manager）"></a>1.創建 swarm 集群管理節點（manager）</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> docker-machine create -d virtualbox swarm-manager</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> docker-machine ls</span></span><br><span class="line">NAME            ACTIVE   DRIVER       STATE     URL                         SWARM   DOCKER      ERRORS</span><br><span class="line">swarm-manager   -        virtualbox   Running   tcp://192.168.99.105:2376           v19.03.12</span><br></pre></td></tr></table></figure>
+<p>初始化 swarm 集群，進行初始化的這台機器，就是集群的管理節點。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> docker-machine ssh swarm-manager</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> docker swarm init --advertise-addr 192.168.99.105 <span class="comment"># 這裡的 IP 為創建機器時分配的 ip。</span></span></span><br><span class="line">   ( &#x27;&gt;&#x27;)</span><br><span class="line">  /) TC (\   Core is distributed with ABSOLUTELY NO WARRANTY.</span><br><span class="line"> (/-_--_-\)           www.tinycorelinux.net</span><br><span class="line"></span><br><span class="line">docker@swarm-manager:~$ docker swarm init --advertise-addr 192.168.99.105</span><br><span class="line">Swarm initialized: current node (3hh7wpan76822hx6zbpvgxi5n) is now a manager.</span><br><span class="line"></span><br><span class="line">To add a worker to this swarm, run the following command:</span><br><span class="line"></span><br><span class="line">    docker swarm join --token SWMTKN-1-5dtpdjrjpzj1cn4hmdzmf26o4shsd1t4hezguuq72sj1y42y67-cony79xnoz0imr1emo2uo4hjf 192.168.99.105:2377</span><br><span class="line"></span><br><span class="line">To add a manager to this swarm, run &#x27;docker swarm join-token manager&#x27; and follow the instructions.</span><br></pre></td></tr></table></figure>
+<p>看到上面訊息證明已經初始化成功。需要把以下這行複制出來，在增加工作節點時會用到</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> docker swarm join --token SWMTKN-1-5dtpdjrjpzj1cn4hmdzmf26o4shsd1t4hezguuq72sj1y42y67-cony79xnoz0imr1emo2uo4hjf 192.168.99.105:2377</span></span><br></pre></td></tr></table></figure>
+<h5 id="2-創建-swarm-集群工作節點（worker）"><a href="#2-創建-swarm-集群工作節點（worker）" class="headerlink" title="2.創建 swarm 集群工作節點（worker）"></a>2.創建 swarm 集群工作節點（worker）</h5><p>創建好倆台機器，swarm-worker1 和 swarm-worker2</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> docker-machine create -d virtualbox swarm-worker1</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> docker-machine create -d virtualbox swarm-worker2</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> docker-machine ls</span></span><br><span class="line">NAME            ACTIVE   DRIVER       STATE     URL                         SWARM   DOCKER      ERRORS</span><br><span class="line">swarm-manager   -        virtualbox   Running   tcp://192.168.99.105:2376           v19.03.12</span><br><span class="line">swarm-worker1   -        virtualbox   Running   tcp://192.168.99.106:2376           v19.03.12</span><br><span class="line">swarm-worker2   -        virtualbox   Running   tcp://192.168.99.107:2376           v19.03.12</span><br></pre></td></tr></table></figure>
+<p>分別進入兩個機器裡，指定添加至上一步中創建的集群，這裡會用到上一步複製的內容 (docker swarm join –token SWMTKN-1-5dtpdjrjpzj1cn4hmdzmf26o4shsd1t4hezguuq72sj1y42y67-cony79xnoz0imr1emo2uo4hjf 192.168.99.105:2377)。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> docker-machine ssh swarm-worker1</span></span><br><span class="line">   ( &#x27;&gt;&#x27;)</span><br><span class="line">  /) TC (\   Core is distributed with ABSOLUTELY NO WARRANTY.</span><br><span class="line"> (/-_--_-\)           www.tinycorelinux.net</span><br><span class="line"></span><br><span class="line">&lt;mf26o4shsd1t4hezguuq72sj1y42y67-cony79xnoz0imr1emo2uo4hjf 192.168.99.105:2377</span><br><span class="line">This node joined a swarm as a worker.</span><br></pre></td></tr></table></figure>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> docker-machine ssh swarm-worker2</span></span><br><span class="line">   ( &#x27;&gt;&#x27;)</span><br><span class="line">  /) TC (\   Core is distributed with ABSOLUTELY NO WARRANTY.</span><br><span class="line"> (/-_--_-\)           www.tinycorelinux.net</span><br><span class="line"></span><br><span class="line">&lt;mf26o4shsd1t4hezguuq72sj1y42y67-cony79xnoz0imr1emo2uo4hjf 192.168.99.105:2377</span><br><span class="line">This node joined a swarm as a worker.</span><br></pre></td></tr></table></figure>
+<p>看到 <code>This node joined a swarm as a worker.</code> 說明已經添加成功</p>
+<h5 id="3-查看集群信息"><a href="#3-查看集群信息" class="headerlink" title="3.查看集群信息"></a>3.查看集群信息</h5><p>進入管理節點 (swarm-manager)，執行：docker info 可以查看當前集群的信息。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> docker-machine ssh swarm-manager</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> docker-machine info</span></span><br><span class="line">Client:</span><br><span class="line"> Debug Mode: false</span><br><span class="line"></span><br><span class="line">Server:</span><br><span class="line"> Containers: 0</span><br><span class="line">  Running: 0</span><br><span class="line">  Paused: 0</span><br><span class="line">  Stopped: 0</span><br><span class="line"> Images: 0</span><br><span class="line"> Server Version: 19.03.12</span><br><span class="line"> Storage Driver: overlay2</span><br><span class="line">  Backing Filesystem: extfs</span><br><span class="line">  Supports d_type: true</span><br><span class="line">  Native Overlay Diff: true</span><br><span class="line"> Logging Driver: json-file</span><br><span class="line"> Cgroup Driver: cgroupfs</span><br><span class="line"> Plugins:</span><br><span class="line">  Volume: local</span><br><span class="line">  Network: bridge host ipvlan macvlan null overlay</span><br><span class="line">  Log: awslogs fluentd gcplogs gelf journald json-file local logentries splunk syslog</span><br><span class="line"> Swarm: active</span><br><span class="line">  NodeID: 3hh7wpan76822hx6zbpvgxi5n</span><br><span class="line">  Is Manager: true</span><br><span class="line">  ClusterID: fwuu59pmo80errw003ou0h7j2</span><br><span class="line">  Managers: 1</span><br><span class="line">  Nodes: 3</span><br></pre></td></tr></table></figure>
+<p>透過 <code>docker-machine info</code> 可以知道當前運行的集群中，有三個節點，其中有一個是管理節點</p>
+<h5 id="4-部署服務到集群中"><a href="#4-部署服務到集群中" class="headerlink" title="4.部署服務到集群中"></a>4.部署服務到集群中</h5><ul>
+<li><code>注意</code>：跟集群管理有關的任何操作，都是在管理節點上操作的</li>
+</ul>
+<p>以下例子在一個工作節點上創建一個名為 helloworld 的服務，這裡是隨機指派給一個工作節點</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">docker@swarm-manager:~$ docker service create --replicas 1 --name helloworld alpine ping docker.com</span><br><span class="line">ahsh0qv0ueiynt3fktt7ap3en</span><br><span class="line">overall progress: 1 out of 1 tasks</span><br><span class="line">1/1: running   [==================================================&gt;]</span><br><span class="line">verify: Service converged</span><br></pre></td></tr></table></figure>
+<h5 id="5-查看服務部署情況"><a href="#5-查看服務部署情況" class="headerlink" title="5.查看服務部署情況"></a>5.查看服務部署情況</h5><p>查看 helloworld 服務運行在哪個節點上</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">docker@swarm-manager:~$ docker service ps helloworld</span><br><span class="line">ID                  NAME                IMAGE               NODE                DESIRED STATE       CURRENT STATE           ERROR               PORTS</span><br><span class="line">8pyy6usqvo0m        helloworld.1        alpine:latest       swarm-manager       Running             Running 5 minutes ago</span><br></pre></td></tr></table></figure>
+<p>查看 helloworld 部署的具體信息</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">docker@swarm-manager:~$ docker service inspect --pretty helloworld</span><br><span class="line">ID:		5z3jcpxi2s61s5ql4qe0kckng</span><br><span class="line">Name:		helloworld</span><br><span class="line">Service Mode:	Replicated</span><br><span class="line"> Replicas:	1</span><br><span class="line">Placement:</span><br><span class="line">UpdateConfig:</span><br><span class="line"> Parallelism:	1</span><br><span class="line"> On failure:	pause</span><br><span class="line"> Monitoring Period: 5s</span><br><span class="line"> Max failure ratio: 0</span><br><span class="line"> Update order:      stop-first</span><br><span class="line">RollbackConfig:</span><br><span class="line"> Parallelism:	1</span><br><span class="line"> On failure:	pause</span><br><span class="line"> Monitoring Period: 5s</span><br><span class="line"> Max failure ratio: 0</span><br><span class="line"> Rollback order:    stop-first</span><br><span class="line">ContainerSpec:</span><br><span class="line"> Image:		alpine:latest@sha256:a75afd8b57e7f34e4dad8d65e2c7ba2e1975c795ce1ee22fa34f8cf46f96a3be</span><br><span class="line"> Args:		ping docker.com</span><br><span class="line"> Init:		false</span><br><span class="line">Resources:</span><br><span class="line">Endpoint Mode:	vip</span><br></pre></td></tr></table></figure>
+<h5 id="6-擴展集群服務"><a href="#6-擴展集群服務" class="headerlink" title="6.擴展集群服務"></a>6.擴展集群服務</h5><p>將上述的 helloworld 服務擴展到倆個節點</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">docker@swarm-manager:~$ docker service scale helloworld=2</span><br><span class="line">helloworld scaled to 2</span><br><span class="line">overall progress: 2 out of 2 tasks</span><br><span class="line">1/2: running   [==================================================&gt;]</span><br><span class="line">2/2: running   [==================================================&gt;]</span><br><span class="line">verify: Service converged</span><br></pre></td></tr></table></figure>
+<p>可以看到已經從一個節點，擴展到兩個節點</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">docker@swarm-manager:~$ docker service ps helloworld</span><br><span class="line">ID                  NAME                IMAGE               NODE                DESIRED STATE       CURRENT STATE            ERROR               PORTS</span><br><span class="line">8pyy6usqvo0m        helloworld.1        alpine:latest       swarm-manager       Running             Running 8 minutes ago</span><br><span class="line">nn1q3c9r95xn        helloworld.2        alpine:latest       swarm-worker1       Running             Running 38 seconds ago</span><br></pre></td></tr></table></figure>
+<h5 id="7-刪除服務"><a href="#7-刪除服務" class="headerlink" title="7.刪除服務"></a>7.刪除服務</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker@swarm-manager:~$ docker service rm helloworld</span><br></pre></td></tr></table></figure>
+<p>查看是否已刪除</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">docker@swarm-manager:~$ docker service ps helloworld</span><br><span class="line">no such service: helloworld</span><br></pre></td></tr></table></figure>
+<h5 id="8-滾動升級服務"><a href="#8-滾動升級服務" class="headerlink" title="8.滾動升級服務"></a>8.滾動升級服務</h5><p>創建一個 3.0.6 版本的 redis</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker@swarm-manager:~$ docker service create --replicas 1 --name redis --update-delay 10s redis:3.0.6</span><br></pre></td></tr></table></figure>
+<p>滾動升級 redis</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">docker@swarm-manager:~$ docker service update --image redis:3.0.7 redis</span><br><span class="line">redis</span><br><span class="line">overall progress: 3 out of 3 tasks</span><br><span class="line">1/3: running   [==================================================&gt;]</span><br><span class="line">2/3: running   [==================================================&gt;]</span><br><span class="line">3/3: running   [==================================================&gt;]</span><br></pre></td></tr></table></figure>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">docker@swarm-manager:~$ docker service ps redis</span><br><span class="line">ID                  NAME                IMAGE               NODE                DESIRED STATE       CURRENT STATE             ERROR               PORTS</span><br><span class="line">uhruiqyffjnh        redis.1             redis:3.0.7         swarm-manager       Running             Running 49 seconds ago</span><br><span class="line">enkm237gz8hk         \_ redis.1         redis:3.0.6         swarm-manager       Shutdown            Shutdown 58 seconds ago</span><br><span class="line">pct5ilubc8m0        redis.2             redis:3.0.7         swarm-worker2       Running             Running 28 seconds ago</span><br><span class="line">nifehoc2zydo         \_ redis.2         redis:3.0.6         swarm-worker2       Shutdown            Shutdown 38 seconds ago</span><br><span class="line">ybtdzzt55uzc        redis.3             redis:3.0.7         swarm-worker1       Running             Running 8 seconds ago</span><br><span class="line">q8di6s6d5ur9         \_ redis.3         redis:3.0.6         swarm-worker1       Shutdown            Shutdown 17 seconds ago</span><br></pre></td></tr></table></figure>
+<p>查看一下可以知道 redis 的版​​本已經從 3.0.6 升級到了 3.0.7，說明服務已經升級成功</p>
+<h5 id="9-停止某個節點接收新的任務"><a href="#9-停止某個節點接收新的任務" class="headerlink" title="9.停止某個節點接收新的任務"></a>9.停止某個節點接收新的任務</h5><p>查看所有的節點</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">docker@swarm-manager:~$ docker node ls</span><br><span class="line">ID                            HOSTNAME            STATUS              AVAILABILITY        MANAGER STATUS      ENGINE VERSION</span><br><span class="line">3hh7wpan76822hx6zbpvgxi5n *   swarm-manager       Ready               Active              Leader              19.03.12</span><br><span class="line">ryiudwdxuew48iajzpgfju7co     swarm-worker1       Ready               Active                                  19.03.12</span><br><span class="line">fz568ek0pd5vw5gqykpook8ky     swarm-worker2       Ready               Active                                  19.03.12</span><br></pre></td></tr></table></figure>
+<p>可以看到目前所有的節點都是 Active, 可以接收新的任務分配</p>
+<p>停止節點 swarm-worker1</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">docker@swarm-manager:~$  docker node update --availability drain swarm-worker1</span><br><span class="line">swarm-worker1</span><br><span class="line">docker@swarm-manager:~$ docker node ls</span><br><span class="line">ID                            HOSTNAME            STATUS              AVAILABILITY        MANAGER STATUS      ENGINE VERSION</span><br><span class="line">3hh7wpan76822hx6zbpvgxi5n *   swarm-manager       Ready               Active              Leader              19.03.12</span><br><span class="line">ryiudwdxuew48iajzpgfju7co     swarm-worker1       Ready               Drain                                   19.03.12</span><br><span class="line">fz568ek0pd5vw5gqykpook8ky     swarm-worker2       Ready               Active                                  19.03.12</span><br></pre></td></tr></table></figure>
+<p><code>注意</code>：swarm-worker1 狀態變為 Drain。不會影響到集群的服務，只是 swarm-worker1 節點不再接收新的任務，集群的負載能力有所下降。可以通過以下命令重新激活節點</p>
+<p>啟動節點 swarm-worker1</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">docker@swarm-manager:~$ docker node update --availability active swarm-worker1</span><br><span class="line">swarm-worker1</span><br><span class="line">docker@swarm-manager:~$ docker node ls</span><br><span class="line">ID                            HOSTNAME            STATUS              AVAILABILITY        MANAGER STATUS      ENGINE VERSION</span><br><span class="line">3hh7wpan76822hx6zbpvgxi5n *   swarm-manager       Ready               Active              Leader              19.03.12</span><br><span class="line">ryiudwdxuew48iajzpgfju7co     swarm-worker1       Ready               Active                                  19.03.12</span><br><span class="line">fz568ek0pd5vw5gqykpook8ky     swarm-worker2       Ready               Active                                  19.03.12</span><br></pre></td></tr></table></figure>
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Docker/" rel="tag"># Docker</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/02/25/docker-achine/" rel="prev" title="Docker Machine">
+      <i class="fa fa-chevron-left"></i> Docker Machine
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目錄
+        </li>
+        <li class="sidebar-nav-overview">
+          本站概要
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8E%9F%E7%90%86"><span class="nav-number">2.</span> <span class="nav-text">原理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8"><span class="nav-number">3.</span> <span class="nav-text">使用</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#1-%E5%89%B5%E5%BB%BA-swarm-%E9%9B%86%E7%BE%A4%E7%AE%A1%E7%90%86%E7%AF%80%E9%BB%9E%EF%BC%88manager%EF%BC%89"><span class="nav-number">3.0.1.</span> <span class="nav-text">1.創建 swarm 集群管理節點（manager）</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#2-%E5%89%B5%E5%BB%BA-swarm-%E9%9B%86%E7%BE%A4%E5%B7%A5%E4%BD%9C%E7%AF%80%E9%BB%9E%EF%BC%88worker%EF%BC%89"><span class="nav-number">3.0.2.</span> <span class="nav-text">2.創建 swarm 集群工作節點（worker）</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#3-%E6%9F%A5%E7%9C%8B%E9%9B%86%E7%BE%A4%E4%BF%A1%E6%81%AF"><span class="nav-number">3.0.3.</span> <span class="nav-text">3.查看集群信息</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#4-%E9%83%A8%E7%BD%B2%E6%9C%8D%E5%8B%99%E5%88%B0%E9%9B%86%E7%BE%A4%E4%B8%AD"><span class="nav-number">3.0.4.</span> <span class="nav-text">4.部署服務到集群中</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#5-%E6%9F%A5%E7%9C%8B%E6%9C%8D%E5%8B%99%E9%83%A8%E7%BD%B2%E6%83%85%E6%B3%81"><span class="nav-number">3.0.5.</span> <span class="nav-text">5.查看服務部署情況</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#6-%E6%93%B4%E5%B1%95%E9%9B%86%E7%BE%A4%E6%9C%8D%E5%8B%99"><span class="nav-number">3.0.6.</span> <span class="nav-text">6.擴展集群服務</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#7-%E5%88%AA%E9%99%A4%E6%9C%8D%E5%8B%99"><span class="nav-number">3.0.7.</span> <span class="nav-text">7.刪除服務</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#8-%E6%BB%BE%E5%8B%95%E5%8D%87%E7%B4%9A%E6%9C%8D%E5%8B%99"><span class="nav-number">3.0.8.</span> <span class="nav-text">8.滾動升級服務</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#9-%E5%81%9C%E6%AD%A2%E6%9F%90%E5%80%8B%E7%AF%80%E9%BB%9E%E6%8E%A5%E6%94%B6%E6%96%B0%E7%9A%84%E4%BB%BB%E5%8B%99"><span class="nav-number">3.0.9.</span> <span class="nav-text">9.停止某個節點接收新的任務</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Samuel Huang</p>
+  <div class="site-description" itemprop="description">Samuel Notes</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">12</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-name">標籤</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Samuel Huang</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 強力驅動
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
